@@ -96,6 +96,7 @@ class Record:
             return '{:<20}|{:^15}| days till the next Birthday {:>15}s \n'.format(diff)
         return "Birth date not added"
 
+
 class AddressBook(UserDict):
 
     def __iter__(self, n):
@@ -114,10 +115,6 @@ class AddressBook(UserDict):
     def add_record(self, record: Record):
         self.data[record.name.value] = record
 
-    def key_finder(self):
-        dat = self.data
-        find = re.findall('\w+', dat)
-        print(find)
 
 def input_error(func):
     def wrapper(*args, **kwargs):
@@ -129,7 +126,6 @@ def input_error(func):
             return "Give me 'name' and 'phone' please"
         except ValueError:
             return "Give me 'change' 'name' 'number'"
-
     return wrapper
 
 
@@ -185,6 +181,13 @@ def input_phone(*args):
 def input_show():
     return "\n".join([f"{v.name.value}: {v.nums} " for v in ab.values()])
 
+#def find():
+#    dat = ab.values()
+#
+#    for key in ab:
+#        search = re.findall('\w+', dat)
+#        print(search)
+
 
 COMMANDS = {
     start_bot: "hello",
@@ -216,12 +219,18 @@ dt = AddressBook()
 with shelve.open(filename) as fn:
     fn['dt'] = dt
 
-print('--------')
 
 with shelve.open(filename) as states:
     for key in states:
         print(f'{key}: {states[key]}')
 
+def find():
+    search = input()
+
+    with open(filename, 'r') as f:
+        for line in f.readlines():
+            if line.startswith(search):
+                print(line)
 
 if __name__ == "__main__":
     main()
