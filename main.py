@@ -181,13 +181,6 @@ def input_phone(*args):
 def input_show():
     return "\n".join([f"{v.name.value}: {v.nums} " for v in ab.values()])
 
-#def find():
-#    dat = ab.values()
-#
-#    for key in ab:
-#        search = re.findall('\w+', dat)
-#        print(search)
-
 
 COMMANDS = {
     start_bot: "hello",
@@ -224,13 +217,14 @@ with shelve.open(filename) as states:
     for key in states:
         print(f'{key}: {states[key]}')
 
-def find():
-    search = input()
 
-    with open(filename, 'r') as f:
-        for line in f.readlines():
-            if line.startswith(search):
-                print(line)
+def find():
+    search = input(">>> ")
+    source = open(filename, 'r')
+
+    for line in source:
+        if re.match(search, line):
+            print(f'{line}')
 
 if __name__ == "__main__":
     main()
