@@ -219,11 +219,11 @@ with shelve.open(filename) as states:
 
 
 def find():
-    search = input(">>> ")
+    search = raw_input(">>> ")
     source = open(filename, 'r')
 
     for line in source:
-        if re.match(search, line):
+        if re.match("**(.*)"+search+"(.*)**", line):
             print(f'{line}')
 
 if __name__ == "__main__":
