@@ -99,6 +99,8 @@ class Record:
 
 class AddressBook(UserDict):
 
+    filename = 'database/ab_data'
+
     def __iter__(self, n):
         self.n = n
         self.count = 0
@@ -114,6 +116,24 @@ class AddressBook(UserDict):
 
     def add_record(self, record: Record):
         self.data[record.name.value] = record
+
+    def save(self):
+        with shelve.open(filename, 'wb', encoding="utf-8") as fn:
+            fn[self.data] = self.data
+
+    def load(self):
+        with shelve.open(filename, 'rb', encoding="utf-8") as states:
+            for key in states:
+                print(f'{key}: {states[key]}')
+
+    def find(self):
+        res = {}
+        search = raw_input(">>> ")
+
+        for k, v in ab.items():
+            if re.match("**(.*)" + search + "(.*)**", k) or re.match("**(.*)" + search + "(.*)**", v):
+                res[k] = v
+                return res
 
 
 def input_error(func):
@@ -205,26 +225,6 @@ def main():
         print(cmd(*data))
 
 
-filename = 'database/ab_data'
-
-dt = AddressBook()
-
-with shelve.open(filename) as fn:
-    fn['dt'] = dt
-
-
-with shelve.open(filename) as states:
-    for key in states:
-        print(f'{key}: {states[key]}')
-
-
-def find():
-    search = raw_input(">>> ")
-    source = open(filename, 'r')
-
-    for line in source:
-        if re.match("**(.*)"+search+"(.*)**", line):
-            print(f'{line}')
 
 if __name__ == "__main__":
     main()
