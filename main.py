@@ -87,7 +87,7 @@ class Record:
             self.nums.append(new_num)
             return new_num
 
-    def days_to_birthday(self, bday: Birthday):
+    def days_to_birthday(self):
         if self.bday:
             start = date.today()
             next_bday = datetime.strptime(str(self.bday), '%d.%m.%Y')
