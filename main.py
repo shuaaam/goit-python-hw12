@@ -1,8 +1,10 @@
+from ast import arg
 from collections import UserDict
 from datetime import datetime
 from datetime import date
 import shelve
 import re
+
 
 class Field:
     def __init__(self, value: str) -> None:
@@ -15,11 +17,9 @@ class Name(Field):
         self.__value = None
         self.value = value
 
-
     @property
     def name(self):
         return self.value
-
 
     @name.setter
     def name(self, value):
@@ -96,15 +96,29 @@ class Record:
             return '{:<20}|{:^15}| days till the next Birthday {:>15}s \n'.format(diff)
         return "Birth date not added"
 
+    def __repr__(self):
+        return f'{", ".join([p.value for p in self.nums])}'
+
 
 class AddressBook(UserDict):
+    def __init__(self):
+        super().__init__()
+        self.n = None
 
-    filename = 'database/ab_data'
+        filename = 'database/ab_data'
+        dt = self.data
+
+        with shelve.open(filename) as fn:
+                fn['dt'] = dt
+
+        with shelve.open(filename) as states:
+            for key in states:
+                print(f'{key}: {states[key]}')
 
     def __iter__(self, n):
-        self.n = n
-        self.count = 0
-        return self
+         self.n = n
+         self.count = 0
+         return self
 
     def __next__(self):
         self.count += 1
@@ -117,23 +131,19 @@ class AddressBook(UserDict):
     def add_record(self, record: Record):
         self.data[record.name.value] = record
 
-    def save(self):
-        with shelve.open(filename, 'wb', encoding="utf-8") as fn:
-            fn[self.data] = self.data
 
-    def load(self):
-        with shelve.open(filename, 'rb', encoding="utf-8") as states:
-            for key in states:
-                print(f'{key}: {states[key]}')
+    def find(self, param: str):
 
-    def find(self):
-        res = {}
-        search = raw_input(">>> ")
+        if len(param) < 3:
+            raise ValueError("Param for find must be eq or grater then 3 symbols.")
 
-        for k, v in ab.items():
-            if re.match("**(.*)" + search + "(.*)**", k) or re.match("**(.*)" + search + "(.*)**", v):
-                res[k] = v
-                return res
+        ab = AddressBook()
+
+        for k, v in self.items():
+            if param.lower() in k.lower() or [p.value for p in v.nums if param in p.value]:
+                ab.add_record(v)
+                continue
+        return ab
 
 
 def input_error(func):
@@ -146,6 +156,7 @@ def input_error(func):
             return "Give me 'name' and 'phone' please"
         except ValueError:
             return "Give me 'change' 'name' 'number'"
+
     return wrapper
 
 
@@ -198,6 +209,11 @@ def input_phone(*args):
         return rec.phones()
 
 
+@input_error
+def find(*args):
+    return ab.find(args[0])
+
+
 def input_show():
     return "\n".join([f"{v.name.value}: {v.nums} " for v in ab.values()])
 
@@ -210,7 +226,8 @@ COMMANDS = {
     input_change: "change",
     exit_bot: "good bye",
     close_bot: "close",
-    bye_bot: "exit"
+    bye_bot: "exit",
+    find: "find"
 }
 
 
@@ -223,7 +240,6 @@ def main():
             if user_input.startswith(v):
                 cmd, data = k, user_input[len(v):].strip().split()
         print(cmd(*data))
-
 
 
 if __name__ == "__main__":
